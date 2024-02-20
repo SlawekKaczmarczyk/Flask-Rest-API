@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_restful import Api, Resource, reqparse
+from flask_restful import Api, Resource, reqparse, abort
 
 app = Flask(__name__)
 api = Api(app)
@@ -11,9 +11,13 @@ video_put_args.add_argument("rating", type=int, help="Rating of the video out of
  
 videos={}
 
+def abortV(video_id): # if video doesn't exist
+    if video_id not in videos:
+        abort(404, message="Video id not found!")
 
 class Video(Resource):
     def get(self,video_id):
+        abortV(video_id)
         return videos[video_id] # return a json format
     
     def put(self,video_id):
