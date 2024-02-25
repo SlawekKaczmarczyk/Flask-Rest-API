@@ -11,19 +11,25 @@ video_put_args.add_argument("rating", type=int, help="Rating of the video out of
  
 videos={}
 
-def abortV(video_id): # if video doesn't exist
+def abort_if_video_not_existing(video_id): # if video doesn't exist
     if video_id not in videos:
         abort(404, message="Video id not found!")
 
+def abort_if_video_exists(video_id):
+    if video_id in videos:
+        abort(409, message="Video with that ID already exists!") # 409 stands for already existing
+
 class Video(Resource):
     def get(self,video_id):
-        abortV(video_id)
+        abort_if_video_not_existing(video_id)
         return videos[video_id] # return a json format
     
     def put(self,video_id):
+        abort_if_video_exists(video_id) # Don't create video that already exists
         args = video_put_args.parse_args()
         videos[video_id] = args 
         return videos[video_id], 201 #201 stands for created
+    
     
 
 api.add_resource(Video, "/video/<int:video_id>")
